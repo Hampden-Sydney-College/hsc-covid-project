@@ -235,5 +235,5 @@ OxCGRT %>%
   mutate(stringency_index_lag = dplyr::lag(stringency_index, 14),
          neighbor_dummy = if_else(percent_who_trust_all_most_neighbors > 50, 1, 0)) %>% 
   ungroup() %>% 
-  filter(date <= last_date) %>% 
+  filter(date >= "03-01-2020" & date <= last_date) %>% 
   write_csv(here::here("data", "covid_data_final.csv"))

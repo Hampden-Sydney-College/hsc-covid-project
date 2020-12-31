@@ -8,7 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(here)
+
 ```
 
 # Read Global Mobility Report
@@ -17,7 +17,7 @@ Global Mobility Report exceeds github file size
 
 ```{r global-mobility-report}
 global_mobility_report <- 
-here("data", "Global_Mobility_Report.csv") %>% 
+here::here("data", "Global_Mobility_Report.csv") %>% 
   read_csv(col_types =
       cols(
         country_region_code = col_character(),
@@ -43,9 +43,26 @@ here("data", "Global_Mobility_Report.csv") %>%
 You can also embed plots, for example:
 
 ```{r us-mobility-report}
+us_mobility <- 
 global_mobility_report %>% 
   filter(country_region_code == "US") %>% 
-  write_csv(here("data", "us_mobility_report.csv"))
+  select(-country_region, -metro_area) %>% 
+  rename(state = sub_region_1, county = sub_region_2, fips = census_fips_code) %>% 
+write_csv(us_mobility, "data/us_mobility_report.csv")
+```
+
+
+```{r}
+global_mobility_report %>% 
+  filter(country_region_code == "US") %>% 
+  select(-country_region, -metro_area) %>% 
+  rename(state = sub_region_1, county = sub_region_2, fips = census_fips_code) %>% 
+  pivot_longer(contains("percent"),
+               values_to = "percent_change_from_baseline",
+               names_to = "mobility_index") %>% 
+  filter(county == "Prince Edward County") %>% 
+  ggplot(aes(x = date, y = percent_change_from_baseline, color = mobility_index)) + 
+  geom_line()
 ```
 
 

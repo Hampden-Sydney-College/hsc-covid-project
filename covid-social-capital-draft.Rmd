@@ -137,22 +137,15 @@ df %>%
   ) %>% 
   summary()
 ```
+
 ##  base model index-dummy and controls iv
 
-```{r}
+```{r base-model-iv-approach}
 df %>% 
+  filter(date >= "2020-03-01") %>% 
   plm::plm(
-    cases_new ~ stringency_index_lag * state_level_dummy +
-    median_household_income + 
-      percent_adults_with_ba + 
-      percent_in_fair_or_poor_health +
-      percent_black + 
-      density + 
-      percent_rural +
-      percent_65 + 
-      average_temperature + 
-      governor_political_affiliation |
-      stringency_index_lag * state_level_dummy +
+    cases_new ~ stringency_index_lag * state_level_dummy |
+      stringency_index_lag + stringency_index_lag:state_level_dummy +
       median_household_income + 
       percent_adults_with_ba + 
       percent_in_fair_or_poor_health +
@@ -184,7 +177,8 @@ df %>%
   plm::plm(
     cases_new ~ state_level_dummy,
     data = .,
-    index = c("date"),
+    effect = "time",
+    index = "state",
     model = "within"
   ) %>%
   summary()
@@ -272,12 +266,22 @@ df %>%
 # model <- 
 df %>%
   plm::plm(
-    cases_new ~ stringency_dummy * state_level_dummy,
+    cases_new ~ stringency_index_lag * state_level_dummy +
+    median_household_income + 
+      percent_adults_with_ba + 
+      percent_in_fair_or_poor_health +
+      percent_black + 
+      density + 
+      percent_rural +
+      percent_65 + 
+      average_temperature + 
+      governor_political_affiliation,
     data = .,
-    index = c("date"),
+    effect = "time",
+    index = "state",
     model = "within"
   ) %>% 
-  # summary() %>% 
+  # summary() #%>% 
   plm::vcovHC(. , method = "white1", type = "HC0", cluster = c("group", "time"))
 ```
 
@@ -546,8 +550,6 @@ models_tidy <-
   transmute(model_name, betas = purrr::map(fit, broom::tidy))
 
 
-  
-
 estimated_models$fit %>% 
   purrr::map_df(broom::tidy) %>% 
   mutate(model = rep(names(models), each = 12), .before = "term") %>% 
@@ -568,9 +570,8 @@ models_tidy %>%
   unnest_wider(betas) %>% 
   # unnest_longer(term) %>% 
   unnest_wider(estimate, names_sep = "_") %>% 
-  unnest_wider(statistic, names_sep = "_") %>% 
+  unnest_wider(std.error, names_sep = "_") %>% 
   select(model_name, ends_with(c("_1", "_2", "_12")))
 ```
-
 
 

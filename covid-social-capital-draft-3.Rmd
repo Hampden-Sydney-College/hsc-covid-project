@@ -1,0 +1,667 @@
+---
+title: "Covid Draft 3"
+author: "Carilli"
+date: "12/30/2020"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = NA, options(scipen = 999, digits = 3))
+library(tidyverse)
+library(gt)
+```
+
+# Data
+```{r data}
+df <- 
+  here::here("data", "covid_data_final.csv") %>% 
+  read_csv()
+```
+
+# Setup
+
+```{r social-capital-models-setup}
+models <- list()
+
+model_names <- c(
+  "state",
+  "family_unity",
+  "family_interaction",
+  "social_support",
+  "community_health",
+  "institutional_health",
+  "collective_efficacy",
+  "philanthropic_health",
+  "trust_neighbor",
+  "penn_state",
+  "putnam_index",
+  "ferrara",
+  "family_prosperity"
+)
+
+social_capital <- c(
+  "state_level_dummy",
+  "family_unity_dummy",
+  "family_interaction_dummy",
+  "social_support_dummy",
+  "community_health_dummy",
+  "institutional_health_dummy",
+  "collective_efficacy_dummy",
+  "philanthropic_health_dummy",
+  "neighbor_dummy",
+  "putnam_index",
+  "scp_version_of_penn_state_index",
+  "alesina_la_ferrara_social_capital_group",
+  "family_prosperity_index"
+)
+
+controls <- c(
+  "median_household_income",
+  "percent_adults_with_ba",
+  "percent_in_fair_or_poor_health",
+  "percent_black",
+  "density",
+  "percent_rural",
+  "percent_65",
+  "average_temperature",
+  "governor_political_affiliation"
+)
+
+```
+
+# Two-way {.tabset}
+## Two-Way linear s.i. {.tabset}
+
+### models
+
+```{r two-ways-linear-stringency}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i], 
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_twoways_linear <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "twoways", index = "state", model = "within")))
+
+models_tidy_linear <- 
+  estimated_models_twoways_linear %>% 
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced_linear <- 
+  estimated_models_twoways_linear %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
+```
+
+### summary
+```{r linear-summary}
+estimated_models_twoways_linear$fit %>% 
+  map(summary)
+```
+
+
+### mar-may
+```{r linear-mar-may}
+estimated_models_twoways_linear_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-03-01"), 
+                                    effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_linear_mar_may$fit %>% 
+  map(summary)
+```
+
+### jun-aug
+
+```{r linear-june-aug}
+estimated_models_twoways_linear_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_linear_jun_aug$fit %>% 
+  map(summary)
+```
+
+### sep-nov
+
+```{r linear-sep-nov}
+estimated_models_twoways_linear_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                    effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_linear_sep_nov$fit %>% 
+  map(summary)
+```
+
+
+## Tables {.tabset}
+### table 1a
+```{r table-1a, eval = FALSE}
+models_tidy_linear %>% 
+  left_join(models_glanced_linear, by = "model_names") %>% 
+  unnest(c(betas, stats), names_repair = "universal") %>% 
+  select(model_names, estimate, std.error, r.squared, statistic...9, p.value...10, nobs) %>% 
+  rename(f_stat = statistic...9, p_val = p.value...10) %>% 
+  mutate(term = rep(c("si", "interact"), times = 13), .before = estimate) %>% 
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(nobs = as.integer(nobs)) %>% 
+  pivot_longer(-c(model_names, term),
+               names_to = "measure",
+               values_to = "value") %>% 
+  pivot_wider(names_from = model_names) %>% 
+  slice(1, 2, 7:12) %>% 
+  mutate(measure = c(
+    "Stringency Index",
+    "se",
+    "Stringency Index * Social Capital Index",
+    "se",
+    "R-sqr",
+    "F",
+    "p-value",
+    "N"
+  )
+  ) %>% 
+  # arrange(match(measure, c("estimate", "std.error")), term) %>% 
+  gt() %>% 
+  fmt_number(model_names, rows = 8, decimals = 0) %>% 
+  cols_label(measure = "",
+             state = "Total Social Capital",
+             family_unity = "Family Unity",
+             family_interaction = "Family Interaction",
+             social_support = "Social Support",
+             community_health = "Community Health",
+             institutional_health = "Instutional Health",
+             collective_efficacy = "Collective Efficacy",
+             philanthropic_health = "Philanthropic Health",
+             trust_neighbor = "Trust Neighbors"
+  ) %>% 
+  tab_spanner("Sub-Index", model_names[2:9]) %>% 
+  cols_align("center") %>% 
+  cols_hide(c(1, 12:15)) %>% 
+  opt_table_lines("default") %>% 
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = vars(measure),
+      rows = 7:8
+    )
+  ) %>% 
+  tab_footnote(
+    footnote = "Siginicant at the 1% level",
+    locations = cells_body(
+      columns = vars(model_names),
+      rows = c(1,3)
+    )
+  ) %>% 
+  opt_footnote_marks(marks = c("*", "+")) %>% 
+  tab_header(
+    title = "Two-way Fixed Effects Results",
+    subtitle = "Joint Economic Committee Social Capital Indicies")
+```
+
+### table 1b
+```{r table-1b, eval = FALSE}
+models_tidy_linear %>% 
+  left_join(models_glanced_linear, by = "model_names") %>% 
+  unnest(c(betas, stats), names_repair = "universal") %>% 
+  select(model_names, estimate, std.error, r.squared, statistic...9, p.value...10, nobs) %>% 
+  rename(f_stat = statistic...9, p_val = p.value...10) %>% 
+  mutate(term = rep(c("si", "interact"), times = 13), .before = estimate) %>% 
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(nobs = as.integer(nobs)) %>% 
+  pivot_longer(-c(model_names, term),
+               names_to = "measure",
+               values_to = "value") %>% 
+  pivot_wider(names_from = model_names) %>% 
+  slice(1, 2, 7:12) %>% 
+  mutate(measure = c(
+    "Stringency Index",
+    "se",
+    "Stringency Index * Social Capital Index",
+    "se",
+    "R-sqr",
+    "F",
+    "p-value",
+    "N"
+  )
+  ) %>% 
+  # arrange(match(measure, c("estimate", "std.error")), term) %>% 
+  gt() %>% 
+  fmt_number(model_names, rows = 8, decimals = 0) %>% 
+  cols_label(measure = "",
+             penn_state = "Penn State Index (SCP)",
+             putnam_index = "Putnam Index",
+             ferrara = "Alesina La Ferrar",
+             family_prosperity = "Family Prosperity"
+  ) %>% 
+  # tab_spanner("Sub-Index", model_names[2:9]) %>% 
+  cols_align("center") %>% 
+  cols_hide(c(1, 3:11)) %>% 
+  opt_table_lines("default") %>% 
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = vars(measure),
+      rows = 7:8
+    )
+  ) %>% 
+  tab_footnote(
+    footnote = "Siginicant at the 1% level",
+    locations = cells_body(
+      columns = vars(model_names),
+      rows = c(1,3)
+    )
+  ) %>% 
+  opt_footnote_marks(marks = c("*", "+")) %>% 
+  tab_header(
+    title = "Two-way Fixed Effects Results",
+    subtitle = "Social Capital Indices")
+```
+
+
+# Two-way quadratic si {.tabset}
+## models
+
+```{r two-ways-quadratic-stringency}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i], 
+      ' + I(stringency_index_lag^2)'
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_twoways_quadratic <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "twoways", index = "state", model = "within")))
+
+models_tidy_quadratic <- 
+  estimated_models_twoways_quadratic %>% 
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced_quadratic <- 
+  estimated_models_twoways_quadratic %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
+```
+
+
+## summary
+```{r quadratic-summary}
+estimated_models_twoways_quadratic$fit %>% 
+  map(summary)
+```
+
+
+## mar-may
+```{r quadratic-mar-may}
+estimated_models_twoways_quadratic_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-03-01"), 
+                                    effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_quadratic_mar_may$fit %>% 
+  map(summary)
+```
+
+## jun-aug
+
+```{r quadratic-june-aug}
+estimated_models_twoways_quadratic_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_quadratic_jun_aug$fit %>% 
+  map(summary)
+```
+
+## sep-nov
+
+```{r quadratic-sep-nov}
+estimated_models_twoways_quadratic_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                     effect = "twoways", index = "state", model = "within")))
+estimated_models_twoways_quadratic_sep_nov$fit %>% 
+  map(summary)
+```
+
+## tables
+### table 2a
+```{r table-2a, eval=FALSE}
+models_tidy_quadratic %>% 
+  left_join(models_glanced_quadratic, by = "model_names") %>% 
+  unnest(c(betas, stats), names_repair = "universal") %>% 
+  select(model_names, estimate, std.error, r.squared, statistic...9, p.value...10, nobs) %>% 
+  rename(f_stat = statistic...9, p_val = p.value...10) %>% 
+  mutate(term = rep(c("si", "interact", "quadratic"), times = 13), .before = estimate) %>% 
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(nobs = as.integer(nobs)) %>% 
+  pivot_longer(-c(model_names, term),
+               names_to = "measure",
+               values_to = "value") %>% 
+  pivot_wider(names_from = model_names)
+```
+
+
+
+
+
+# One-way Linear No Controls{.tabset}
+## One-way linear
+```{r one-way-linear}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i]
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_linear <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear$fit %>% 
+  map(summary)
+
+```
+
+
+## mar - may
+```{r one-way-linear-mar-may}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i]
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_linear_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-05-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_mar_may$fit %>% 
+  map(summary)
+
+```
+
+## jun-aug
+
+```{r one-way-linear-jun-aug}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i]
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_linear_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_jun_aug$fit %>% 
+  map(summary)
+
+```
+## sep - nov
+
+
+```{r one-way-linear-sep-nov}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i]
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_linear_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_sep_nov$fit %>% 
+  map(summary)
+
+```
+# One-way Linear with controls {.tabset}
+## one-way linear with controls
+```{r one-way-linear-controls}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i],
+      ' + ',
+      glue::glue_collapse(controls, " + ")
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_linear_controls <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_controls$fit %>% 
+  map(summary)
+```
+## mar - may
+```{r one-way-linear-controls-mar-may}
+estimated_models_oneway_linear_controls_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-05-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_controls_mar_may$fit %>% 
+  map(summary)
+```
+
+## jun-aug
+
+```{r one-way-linear-controls-jun-aug}
+estimated_models_oneway_linear_controls_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_controls_jun_aug$fit %>% 
+  map(summary)
+```
+
+
+## sep-nov
+
+```{r one-way-linear-controls-sep-nov}
+estimated_models_oneway_linear_controls_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_linear_controls_sep_nov$fit %>% 
+  map(summary)
+```
+
+
+
+# One-way quadratic no controls {.tabset}
+## one-way quadratic
+```{r one-way-quadratic}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i],
+      ' + I(stringency_index_lag^2)'
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_quadratic <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic$fit %>% 
+  map(summary)
+
+```
+
+## mar - may
+
+```{r one-way-quadratic-mar-may}
+estimated_models_oneway_quadratic_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-05-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_mar_may$fit %>% 
+  map(summary)
+```
+
+## jun-aug
+
+```{r one-way-quadratic-jun-aug}
+estimated_models_oneway_quadratic_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_jun_aug$fit %>% 
+  map(summary)
+```
+
+## sep-nov
+
+```{r one-way-quadratic-sep-nov}
+estimated_models_oneway_quadratic_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_sep_nov$fit %>% 
+  map(summary)
+```
+
+
+
+# One-way quadratic with controls {.tabset}
+
+## one-way quadratic with controls
+
+```{r one-way-quadratic-controls}
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * ',
+      social_capital[i],
+      ' + I(stringency_index_lag^2)',
+      ' + ', 
+      glue::glue_collapse(controls, " + ")
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+estimated_models_oneway_quadratic_contols <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df, effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_contols$fit %>% 
+  map(summary)
+```
+
+## mar - may
+
+```{r one-way-quadratic-controls-mar-may}
+estimated_models_oneway_quadratic_controls_mar_may <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date <= "2020-05-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_controls_mar_may$fit %>% 
+  map(summary)
+```
+
+## jun - aug
+
+```{r one-way-quadratic-controls-jun-aug}
+estimated_models_oneway_quadratic_controls_jun_aug <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_controls_jun_aug$fit %>% 
+  map(summary)
+```
+
+## sep - nov
+
+```{r one-way-quadratic-controls-sep-nov}
+estimated_models_oneway_quadratic_controls_sep_nov <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% filter(date >= "2020-09-01"), 
+                                    effect = "time", index = "state", model = "within")))
+
+estimated_models_oneway_quadratic_controls_sep_nov$fit %>% 
+  map(summary)
+```
+
