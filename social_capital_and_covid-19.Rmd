@@ -7,6 +7,7 @@ output:
     toc: true
     toc_float: true
     indent: true
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -23,14 +24,11 @@ Follow the Leader
 
 Subtitle The Complementarity between Social Capital and Formal Public Health Rules in the United States
 
-
 Abstract
 
 Social capital is a well-researched aspect of health outcomes, and scholars are beginning to understand the role it plays in the spread of Covid-19. We advance this emerging literature with a novel framework to analyze the conditions under which social capital influences the spread of Covid-19 and, more importantly, the extent to which social capital bolsters formal public health rules like lockdown orders. With state-level data on daily Covid-19 cases, a measure of policy stringency, and various measures of social capital, we find that states with higher levels of social capital and higher levels of policy stringency see lower prevalence rates. These results are robust to the inclusion of standard controls and various specifications. These results suggest that individuals play an important role in the spread and prevention of infectious diseases independent of formal, governmental public health responses because individuals create and facilitate social capital.
 
-# Social Capital and Covid-19
-
-## 1. Introduction
+# Introduction
 
 In light of the on-going Covid-19 pandemic, scholars are beginning to examine the relationship between social capital and the spread and prevention of Covid-19 (Pitas and Ehmer, 2020; Wong and Kohler, 2020; Borgonovi and Andrieu, 2020; Borgonovi, Andrieu, and Subramanian, 2020; Wu, 2020; Wu et al., 2020; Bartscher et al., 2020; Durante et al., 2020).[^1] The influence social capital has on health outcomes in general is well-studied (Putnam, 2000), and there is even some recognition that social capital influences the spread of infectious diseases by encouraging the use of vaccinations (Nawa and Fujiwara, 2014; Palanisamy, Gopichandran, and Kosalram, 2018) and other behaviors related to influenza (Ronnerstrand, 2013 and 2014; Chuang et al., 2015).
 
@@ -72,7 +70,7 @@ Thus, we resist attempts to alter the level and/or kind of social capital via po
 
 In any event, the relationships between social capital, formal public health rules, and the spread of infectious diseases enhances our understanding of how people spread infectious diseases. Just as we recognize individuals can influence the formal and informal rules that influence economic, political, and social behaviors, we should recognize individuals also influence how diseases spread by the formal and informal rules they create and adapt.
 
-## 2. Social Capital, Formal Rules, and Covid-19
+# Social Capital, Formal Rules, and Covid-19
 
 Social capital takes various forms between individuals so as to encourage cooperation, which then influences health outcomes. Two of the main forms of social capital include *bridging* between people within a social network and *bonding* between people from different social networks. We do not take a stance as to which form of social capital is more or less relevant in the context Covid-19. We do, however, provide evidence below regarding the measured components of social capital. Furthermore, while social capital can be used for legitimate and nefarious activities, we are solely interested in whether social capital influences disease prevalence and public policy effectiveness.
 
@@ -122,7 +120,7 @@ Given normative beliefs and attitudes that value prevention, we posit social cap
 
 Social capital encourages rule-following behavior---again assuming people have beliefs and normative attitudes that value preventative behavior---because it raises the private cost to individuals of breaking rules. Given many people believe public health rules are legitimate and valuable, breaking those rules is taken as an affront punishable informally by a personal rebuke, a worsening reputation, a refusal of service, or fewer social contacts. More formal measures of enforcement and punishment are also relevant, e.g., calling a public health department, a security guard, or the police. Relatedly, people are better able to monitor the behavior of others in areas with stronger social capital given the numerous social ties; this suggests that infractions are more likely to be discovered in areas with stronger social capital. Thus, as strong or severe as a formal public health rule is, social capital will encourage individuals to follow it. All else equal, this effect lowers the number of Covid-19 cases.
 
-## 3. Data and Model
+# Data, Model, and Results
 
 In order to operationalize our basic framework, we specify a simple regression equation,
 
@@ -164,7 +162,7 @@ Table 4 reports the results of our variables of interest for equation 3.[^11] In
 
 [^11]: We did run this regression with the same controls as above, but we do not report these results; they are available upon request.
 
-## 5. Conclusion
+# Conclusion
 
 Notes:
 
