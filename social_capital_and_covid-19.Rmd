@@ -2,15 +2,11 @@
 title: "Social Capital and Covid-19"
 author: "Carson"
 date: '`r format(lubridate::today(), "%B %d, %Y")`'
-output: 
+output:
   html_document:
     toc: true
     toc_float: true
-    df_print: paged
-    theme: cerulean
-    highlight: tango
-    code_folding: hide
-indent: true
+    indent: true
 ---
 
 ```{r setup, include=FALSE}
@@ -18,22 +14,19 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
+Titles
 
-Titles: 
+Fighting Covid-19 Together: the Complementarity between Social Capital and Stringency in the United States
 
-* Fighting Covid-19 Together: the Complementarity between Social Capital and Stringency in the United States
+Do As Your Told
+Follow the Leader
 
-Subtitle: The Complementarity between Social Capital and Formal Public Health Rules in the United States
-
-Abstract:
-
-Social capital is a well-known determinant of health outcomes, and scholars are beginning to understand the role it plays in the spread of Covid-19. We develop a novel framework to analyze the conditions under which social capital influences preventative and infectious behaviors and, more importantly, the extent to which social capital bolsters formal public health rules like lockdown orders. With state-level data on daily Covid-19 cases, a measure of stringency, and various measures of social capital, we find that states with higher levels of social capital and higher levels of stringent policies see lower prevalence rates. These results are robust to the inclusion of standard controls and various specifications. 
-
-These results suggest that individuals play an important role in the spread and prevention of infectious diseases independent of formal, governmental public health responses because individuals create and facilitate social capital. 
-
-Furthermore, these results suggest that stringency measures alone are overestimated when social capital is ignored. 
+Subtitle The Complementarity between Social Capital and Formal Public Health Rules in the United States
 
 
+Abstract
+
+Social capital is a well-researched aspect of health outcomes, and scholars are beginning to understand the role it plays in the spread of Covid-19. We advance this emerging literature with a novel framework to analyze the conditions under which social capital influences the spread of Covid-19 and, more importantly, the extent to which social capital bolsters formal public health rules like lockdown orders. With state-level data on daily Covid-19 cases, a measure of policy stringency, and various measures of social capital, we find that states with higher levels of social capital and higher levels of policy stringency see lower prevalence rates. These results are robust to the inclusion of standard controls and various specifications. These results suggest that individuals play an important role in the spread and prevention of infectious diseases independent of formal, governmental public health responses because individuals create and facilitate social capital.
 
 # Social Capital and Covid-19
 
@@ -133,41 +126,43 @@ Social capital encourages rule-following behavior---again assuming people have b
 
 In order to operationalize our basic framework, we specify a simple regression equation,
 
-*Insert equation 1,*
+Insert equation 1
 
-where the number of daily Covid-19 cases is a function of the 14-day lag of the stringency index from Oxford University's Covid-19 Government Response Tracker (OxCGRT) for the United States. We then add the square of the 14-day lag of the stringency index to demonstrate the diminishing impact of case prevalence as stringency increases. Finally, in our initial empirical treatment we interact the 14-day lagged stringency index with a dummy variable where 1 represents states with an above average value of the Joint Economic Committee's state-level social capital index. We use this dummy variable to represent a general level of social capital within a state. This simple regression equation allows us to investigate the differences in our theoretical framework between the desire for preventative measures and the level of social capital. In other words, we are able to test two of our three hypotheses: do states that desire prevention get better prevalence outcomes and does a higher rate of social capital along with more preventative measures lead to an even larger reduction in prevalence?
+where the number of daily Covid-19 cases is a function of the 14-day lag of the stringency index from Oxford University's Covid-19 Government Response Tracker (OxCGRT) for the United States. We then add the square of the 14-day lag of the stringency index to demonstrate the diminishing impact of case prevalence as stringency increases. Finally, in our initial empirical treatment we interact the 14-day lagged stringency index with a dummy variable where 1 represents states with an above average value of the Joint Economic Committee's state-level social capital index. We use this dummy variable for social capital instead of a continuous variable ---here and below---to represent the general level of social capital within a state, as it makes subsequent interpretations easier. This simple regression equation allows us to investigate the differences in our theoretical framework between the desire for preventative measures and the level of social capital. In other words, we are able to test two of our three hypotheses: do states that desire prevention get better prevalence outcomes and does a higher rate of social capital along with more preventative measures lead to an even larger reduction in prevalence?
 
 The data for our empirical analysis comes from a number of sources. Our dependent variable, the daily number of new cases comes from the Johns Hopkins University Covid-19 surveillance dashboard. Our stringency measures come from Oxford University's COVID-19 Government Response Tracker (OxCGRT) for the United States. This state level data provides a systematic way to measure and compare state governments' responses to the pandemic. The social capital measures and number of other demographic measures were taken from the US Congress Joint Economic Committee's Social Capital Project. This project provides us with a state-level social capital index, which uses a set of specific measures in categories such as family unity, family interaction, social support, community health, institutional health, collective efficacy, and philanthropic health. The aggregate measure is then calculated as a deviation from the mean score with a normalized mean of 0.
 
 Our regression model for equation 1 uses a balanced panel of daily data from March 1, 2020 to November 21, 2020 across all 50 states and the District of Columbia. We estimate equation 1 using a within model that includes both cross-sectional and period fixed effects.
 
-*Insert Table 1 here*
+Insert Table 2 here
 
-The first column in Table 1 provides the empirical results of equation 1. The results state that a one unit increase in the level of daily stringency reduces new cases by 10.00 per million. The effectiveness of stringency diminishes as stringency increases at a rate of 0.07 cases per million. More importantly, states with a higher than average level of social capital and a higher level of daily stringency have increased reductions in new cases by .67 per million. This multiplicative impact suggests that states with higher levels of social capital respond more "collectively," slowing daily disease spread at a higher rate than those states with lower levels of social capital, but with similar levels of stringency. These results support propositions 1 and 2.
+The first column in Table 2 provides the empirical results of equation 1. The results state that a one unit increase in the level of daily stringency reduces new cases by 10.00 per million. The effectiveness of stringency diminishes as stringency increases at a rate of 0.07 cases per million. More importantly, states with a higher than average level of social capital and a higher level of daily stringency have increased reductions in new cases by .67 per million. This multiplicative impact suggests that states with higher levels of social capital respond more "collectively," slowing daily disease spread at a higher rate than those states with lower levels of social capital, but with similar levels of stringency. These results support propositions 1 and 2.
 
 Equation 1 is incredibly simple, so we specify a slightly more complex equation:
 
-*insert equation 2 here,*
+Insert equation 2 here
 
-Equation 2 expands our analysis to include a stand-alone variable for the level of social capital, again measured using a dummy variable that equals one for a state that has an above average social capital index. This specification---presented in column 2 of Table 1---is more flexible than our equation 1 as it includes control variables. This specification also expands the initial results by analyzing state-specific controls on the impact of social capital on disease spread and the benefits of policy stringency.
+Equation 2 expands our analysis to include a stand-alone variable for the level of social capital, again measured using a dummy variable that equals one for a state that has an above average social capital index. This specification---presented in column 2 of Table 2---is more flexible than our equation 1. Furthermore, this specification allows us to add relevant control variables, as shown in equation 3.
 
-Column 3 of Table 1 presents the results of equation 3, which adds a number of controls, including: median household income, the percent of adults with a bachelor's degree, the percent of a state population in fair or poor health, the percent of the population that is black, population density, the percent of the population that is rural, the percent of the population over the age of 65, and average state temperature.
+Insert Equation 3 here
 
-*Insert Equation 3 here*
-
-These variables are used to control for factors that could possibly influence prevalence, as well as a state's desire for prevention. Equation 3 also includes a measure for the political affiliation of the governor, where a 1 represents a Republican governor. We include this measure as an additional proxy for the desire of citizens of a state for prevention measures. We expect that Republican Governors would be less likely to implement highly stringent measures give other values. Our choice of a variable for the Governor's political party references the fact that most preventative measures have been enacted by executive order and not by legislative action. These measures were taken from the US Census American Community Survey (2019), the Bureau of Economic Analysis, and the Bureau of Labor Statistics. Data on the political party of the Governor was taken from ballotpedia.org (accessed Nov. 12, 2020).
+Column 3 of Table 2 presents the results of equation 3, which adds a number of state-specific controls, including: median household income, the percent of adults with a bachelor's degree, the percent of a state population in fair or poor health, the percent of the population that is black, population density, the percent of the population that is rural, the percent of the population over the age of 65, and average state temperature. These variables are used to control for factors that could possibly influence prevalence, as well as a state's desire for prevention. Equation 3 also includes a measure for the political affiliation of the governor, where a 1 represents a Republican governor. Following the Adolph et al. (2020) and Brodeur (2020) who find political affiliation of a governor influences the kind and timing of stringency measures, we include this measure as an additional proxy for the desire of citizens of a state for prevention measures. We expect that Republican Governors would be less likely to implement highly stringent measures give other values. Our choice of a variable for the Governor's political party references the fact that most preventative measures have been enacted by executive order and not by legislative action. These measures were taken from the US Census American Community Survey (2019), the Bureau of Economic Analysis, and the Bureau of Labor Statistics. Data on the political party of the Governor was taken from ballotpedia.org (accessed Nov. 12, 2020).
 
 Given that the social capital data as well as a number of our controls are state-specific and time-invariant, equations 2 and 3 use a pooled specification with period fixed effects to analyze the importance of underlying social capital differences.
 
-The results in Columns 2 and 3 are similar to the two-way fixed effects model in Column 1 and allows us to see with greater detail some of the cross-sectional difference that have played a role in state policy stringency's impact on COVID-19 spread. In particular, stringency is still statistically significant and negative, supporting proposition 1, that people who value prevention will see lower prevalence on average. The positive and significant coefficient on the social capital dummy variable supports proposition 2 that stronger social capital will lead to higher prevalence, supporting the notion that social capital can reinforce beliefs that are counter to the prevention of disease spread {Citation?}. Finally, the negative value on the interaction term supports proposition 3, that states with higher levels of stringency and higher rates of social capital will have an even larger reduction in new cases. Other controls, like race, poverty and education level also have impacts that support previous research {Townsend et al., 2020; Yancy, 2020; }. Interestingly, the dummy representing Republican Governor is statistically insignificant.
+The results in Columns 2 and 3 are similar to the two-way fixed effects model in Column 1 and allows us to see with greater detail some of the cross-sectional differences that have played a role in state policy stringency's impact on COVID-19 spread. In particular, stringency is still statistically significant and negative, supporting Proposition 1, that people who value prevention will see lower prevalence on average. The positive and significant coefficient on the social capital dummy variable supports Proposition 2 that stronger social capital will lead to higher prevalence, supporting the notion that social capital can reinforce beliefs that are counter to the prevention of disease spread. Finally, the negative value on the interaction term supports Proposition 3, that states with higher levels of stringency and higher rates of social capital will have an even larger reduction in new cases. Other controls, like race, poverty and education level also have impacts that support previous research {Townsend et al., 2020; Yancy, 2020}. Interestingly, the dummy representing Republican Governor is statistically insignificant.
 
-In Table 2 we re-estimate our equations 2 and 3 with alternate measures of social capital from previous literature. These measures include: SCP version of Penn State Index (2014), the Putnam Index (2000), and the Alesina & La Ferrara social capital group (2000). All of these measures were taken from the JEC Social Capital Project dataset. Once again, our results are consistent across different measures of social capital.
+In Table 3 we re-estimate our equations 2 and 3 with alternate measures of social capital from previous literature. These measures include: SCP version of Penn State Index (2014), the Putnam Index (2000), and the Alesina & La Ferrara social capital group (2000). All of these measures were taken from the JEC Social Capital Project dataset. Once again, our results are consistent across different measures of social capital.
 
-*[Insert table 2 here]*
+Insert table 2 and 3 here
 
-*[Insert Table 5 here]*
+Borgonovi and Andrieu (2020) suggest that people living in counties (in the United States) with more social capital reduced their mobility. Borgonovi, Andrieu, and Subramanian (2020) also found that early on infection rates were higher in counties with more social capital, but transmission and mortality rates declined as people learned more about Covid-19. In order to analyze whether the impact of stringency and social capital has changed over the course of the pandemic, we break our sample into two specific time periods: March 1 – July 4 and July 5 – November 21.
 
-Table 5 reports the results of our variables of interest for equation 3.^[We did run this regression with the same controls as above, but we do not report these results; they are available upon request.] In the first half of the COVID-19 outbreak we see that increased levels of stringency had no significant effect on prevalence, though a higher level of social capital led to a statistically significant increase in prevalence. This result supports earlier findings. Our results also reiterate that states with high social capital saw a significantly lower number of cases as stringency increased. In the second half of the Covid-19 outbreak, post-July 4, we see that higher levels of stringency significantly reduce the number of daily cases, but the impact of higher stringency diminishes more rapidly. This suggests that the higher levels of initial stringency are impactful, but higher levels of stringency over a certain level are less so. Having an above average level of social capital leads to an increase of almost 415 cases per million, supporting the idea that higher social capital states, ceteris paribus, might find it difficult to maintain social distancing over time and are more susceptible to “COVID fatigue.” That said there is still a significant reduction in cases in states that have above average social capital and increased preventative measures.
+Insert Table 4 here
+
+Table 4 reports the results of our variables of interest for equation 3.[^11] In the first half of the COVID-19 outbreak we see that increased levels of stringency had no significant effect on prevalence, though a higher level of social capital led to a statistically significant increase in prevalence. This result supports earlier findings within the literature. Our results also reiterate that states with high social capital saw a significantly lower number of cases as stringency increased. In the second half of the Covid-19 outbreak, post-July 4, we see that higher levels of stringency significantly reduce the number of daily cases, but the impact of higher stringency diminishes more rapidly. This suggests that the higher levels of initial stringency are impactful, but higher levels of stringency over a certain level are less so. Having an above average level of social capital leads to an increase of almost 415 cases per million, supporting the idea that higher social capital states, ceteris paribus, might find it difficult to maintain social distancing over time and are more susceptible to "COVID fatigue." That said there is still a significant reduction in cases in states that have above average social capital and increased preventative measures.
+
+[^11]: We did run this regression with the same controls as above, but we do not report these results; they are available upon request.
 
 ## 5. Conclusion
 
@@ -177,7 +172,7 @@ Notes:
 
 -   Informal rules like those found in social capital influence behavior and bolster formal rules.
 
--   Policy implications are difficult to tease out given social capital is emergent. Social capital is a deeper notion than merely doing what an elected official tells us to do. Trusted advisers, business contacts, friends, and family comprise our social networks and capital.
+-   Policy implications are difficult to tease out given social capital emerges from the interactions between indivdiuals. Social capital is a deeper notion than merely doing what an elected official tells us to do. Trusted advisers, business contacts, friends, and family comprise our social networks and capital.
 
 While we can easily identify measures of social capital, e.g., the number of community centers or the percent of people who donate to charitable organizations, cultivating social capital---in the way it is meant in the literature---is not so simple. Perhaps for future outbreaks, we can discuss the role social capital might have and how to bolster that capital, but it seems unlikely that it will come from a centralized source.
 
@@ -189,9 +184,9 @@ Alternatively, emphasis should be placed on providing quality information about 
 
 -   Supporting Evidence:
 
-    -   Within states that have the worst social capital, are there pockets that have high social capital?
+    * Within states that have the worst social capital, are there pockets that have high social capital?
 
-    \*Similarly, among the states that have really high social capital, are there pockets of really low social capital?
+    * Similarly, among the states that have really high social capital, are there pockets of really low social capital?
 
 At the aggregate level, state scores might have social capital scores that obviously do not accurately reflect differences in social capital at the county level.
 
