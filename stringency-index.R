@@ -1,23 +1,24 @@
 library(rvest)
+library(tidyverse)
 
-web_page <- read_html("https://wallethub.com/edu/states-coronavirus-restrictions/73818/#ask-the-experts")
+web_page <- read_html("https://wallethub.com/edu/states-coronavirus-restrictions/73818")
 
 tbls <- html_nodes(web_page, "table")
 
 tbls_ls <- 
 web_page %>% 
   html_nodes("table") %>% 
-  .[1:2] %>% 
+  .[1:1] %>% 
   html_table(fill = TRUE)
 
 restrictions <- 
 tbls_ls[[1]] %>% 
   as_tibble() %>% 
-  janitor::clean_names() %>% 
-  rename(state = province_state)
+  janitor::clean_names() 
 
-[, 2:5] %>% 
-  as_tibble()
+covid_cum <- 
+  covid19.analytics::covid19.JHU.data() %>% 
+  janitor::clean_names()
 
 covid_cum %>% 
   filter(country_region == "US") %>% 
@@ -40,7 +41,7 @@ covid_cum %>%
          cfr = deaths / cases * 100) %>% 
   left_join(restrictions) %>% 
   lm(cfr ~ total_score, .) %>% 
-  summary()
+  jtools::summ(scale = TRUE)
 
 covid_cum %>% 
   filter(country_region == "US") %>% 
@@ -57,8 +58,9 @@ covid_cum %>%
   geom_smooth(method = "lm")
   
 state_pop <- 
-    read_csv("co-est2019-alldata.csv") %>% 
-    janitor::clean_names() %>% 
+  here::here("data", "co-est2019-alldata.csv") %>% 
+    read_csv() %>% 
+    janitor::clean_names() %>%
     filter(county == "000") %>% 
     select(state = stname, pop = popestimate2019) 
 

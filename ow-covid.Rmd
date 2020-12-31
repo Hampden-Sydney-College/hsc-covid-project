@@ -110,4 +110,3 @@ ow_covid %>%
       index = c("iso_code", "date"), model = "within", effect = "twoways") %>% 
   summary()
 ```
-

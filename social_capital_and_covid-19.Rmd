@@ -3,10 +3,8 @@ title: "Social Capital and Covid-19"
 author: "Carson"
 date: '`r format(lubridate::today(), "%B %d, %Y")`'
 output:
-  html_document:
+  pdf_document:
     toc: true
-    toc_float: true
-    indent: true
     number_sections: true
 ---
 
@@ -124,7 +122,10 @@ Social capital encourages rule-following behavior---again assuming people have b
 
 In order to operationalize our basic framework, we specify a simple regression equation,
 
-Insert equation 1
+$$\begin{equation}
+\tag{1}
+\mathit{New Cases_{i,t}} = \beta_0 + \beta_1\mathit{Stringency}_{i,t} +\beta_2\mathit{Stringency}_{i,t}^{2}\\ +\beta_3\mathit{Sringency_{i,t}} \times \mathit{SocialCapital_{i,t}} + \epsilon_{i,t}
+\end{equation}$$
 
 where the number of daily Covid-19 cases is a function of the 14-day lag of the stringency index from Oxford University's Covid-19 Government Response Tracker (OxCGRT) for the United States. We then add the square of the 14-day lag of the stringency index to demonstrate the diminishing impact of case prevalence as stringency increases. Finally, in our initial empirical treatment we interact the 14-day lagged stringency index with a dummy variable where 1 represents states with an above average value of the Joint Economic Committee's state-level social capital index. We use this dummy variable for social capital instead of a continuous variable ---here and below---to represent the general level of social capital within a state, as it makes subsequent interpretations easier. This simple regression equation allows us to investigate the differences in our theoretical framework between the desire for preventative measures and the level of social capital. In other words, we are able to test two of our three hypotheses: do states that desire prevention get better prevalence outcomes and does a higher rate of social capital along with more preventative measures lead to an even larger reduction in prevalence?
 
@@ -138,11 +139,29 @@ The first column in Table 2 provides the empirical results of equation 1. The re
 
 Equation 1 is incredibly simple, so we specify a slightly more complex equation:
 
-Insert equation 2 here
+$$
+\begin{equation}
+\tag{2}
+\mathit{New Cases_{i,t}} = \beta_0 + \beta_1\mathit{Stringency}_{i,t}
++\beta_2\mathit{Stringency}_{i,t}^{2} \\
++\beta_3\mathit{SocialCaptial_{i,t}}
++\beta_4\mathit{Sringency_{i,t}} \times \mathit{SocialCapital_{i,t}} + \epsilon_{i,t}
+\end{equation}
+$$
 
 Equation 2 expands our analysis to include a stand-alone variable for the level of social capital, again measured using a dummy variable that equals one for a state that has an above average social capital index. This specification---presented in column 2 of Table 2---is more flexible than our equation 1. Furthermore, this specification allows us to add relevant control variables, as shown in equation 3.
 
-Insert Equation 3 here
+$$
+\begin{equation}
+\tag{3}
+\mathit{New Cases_{i,t}} = \beta_0 + \beta_1\mathit{Stringency}_{i,t}
++\beta_2\mathit{Stringency}_{i,t}^{2} \\
++\beta_3\mathit{SocialCaptial_{i,t}}
++\beta_4\mathit{Sringency_{i,t}} \times \mathit{SocialCapital_{i,t}}\\
++ \sum\gamma_i\mathit{X_i}
++ \epsilon_{i,t}
+\end{equation}
+$$
 
 Column 3 of Table 2 presents the results of equation 3, which adds a number of state-specific controls, including: median household income, the percent of adults with a bachelor's degree, the percent of a state population in fair or poor health, the percent of the population that is black, population density, the percent of the population that is rural, the percent of the population over the age of 65, and average state temperature. These variables are used to control for factors that could possibly influence prevalence, as well as a state's desire for prevention. Equation 3 also includes a measure for the political affiliation of the governor, where a 1 represents a Republican governor. Following the Adolph et al. (2020) and Brodeur (2020) who find political affiliation of a governor influences the kind and timing of stringency measures, we include this measure as an additional proxy for the desire of citizens of a state for prevention measures. We expect that Republican Governors would be less likely to implement highly stringent measures give other values. Our choice of a variable for the Governor's political party references the fact that most preventative measures have been enacted by executive order and not by legislative action. These measures were taken from the US Census American Community Survey (2019), the Bureau of Economic Analysis, and the Bureau of Labor Statistics. Data on the political party of the Governor was taken from ballotpedia.org (accessed Nov. 12, 2020).
 
