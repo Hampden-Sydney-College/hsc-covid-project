@@ -1,0 +1,280 @@
+---
+title: "Regression Tables"
+author: "Carilli"
+date: "12/30/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, options(scipen = 999, digits = 3), 
+                      comment = NA, eval = TRUE)
+library(tidyverse)
+library(plm)
+library(stargazer)
+df <- 
+  here::here("data/covid_data_final.csv") %>% 
+  read_csv()
+```
+
+# Table 1 {.tabset}
+
+## models
+
+```{r table-1-models, eval=TRUE}
+model_twoways <- 
+  df %>%
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+
+model_oneway_no_controls <- 
+  df %>%
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "time",
+    index = "state",
+    model = "within"
+  )
+  
+model_oneway_with_controls <- 
+  df %>%
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2) +
+      median_household_income +
+      percent_adults_with_ba +
+      percent_in_fair_or_poor_health +
+      percent_black +
+      density +
+      percent_rural +
+      percent_65 +
+      average_temperature +
+      governor_political_affiliation,
+    data = .,
+    effect = "time",
+    index = "state",
+    model = "within"
+  )
+
+```
+
+## table
+
+```{r table-1, message=FALSE, warning=FALSE, results='asis', eval=TRUE}
+stargazer(
+  model_twoways,
+  model_oneway_no_controls,
+  model_oneway_with_controls,
+  header = FALSE,
+  type = "latex",
+  df = FALSE,
+  # align = TRUE,
+  title = "Regression Results",
+  covariate.labels = c(
+    "Stringency Index Lagged 14 days",
+    "Social Capital Dummy",
+    "Stringency Index Lagged 14 days squared",
+    "Median Household Income",
+    "Percent of Adults with Bachelor's Degree",
+    "Percent of Adults in Fair or Poor Health",
+    "Percent of Population that is Black",
+    "Population Density",
+    "Percent of Population in Rural Areas",
+    "Percent of Population greater than 65 years old",
+    "Average Temperature",
+    "Republican Governor",
+    "Stringency Index Lagged 14 days * Social Capital Dummy"
+  ),
+  # column.labels = c(
+  #   "Two-way Fixed Effects",
+  #   "One-way Fixed Effects",
+  #   "One-way Fixed Effects"
+  # ),
+  # # style = "aer",
+  dep.var.labels = "Daily New Cases per Million"#,
+  
+)
+
+```
+
+# Table 2 {.tabset}
+## models
+```{r table-2-models}
+model_penn_state <- 
+  df %>%
+  mutate(sc = scp_version_of_penn_state_index) %>% 
+  plm(
+    cases_new ~ stringency_index_lag * sc +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+
+model_putnam <- 
+  df %>%
+  mutate(sc = putnam_index) %>% 
+  plm(
+    cases_new ~ stringency_index_lag * sc +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+
+model_alesina <- 
+  df %>%
+  mutate(sc = alesina_la_ferrara_social_capital_group) %>% 
+  plm(
+    cases_new ~ stringency_index_lag * sc +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+```
+
+## table
+
+```{r table-2, message=FALSE, warning=FALSE, results='asis'}
+stargazer(
+  model_alesina,
+  model_putnam,
+  model_penn_state,
+  header = FALSE,
+  df = FALSE,
+  type = "latex",
+  covariate.labels = c(
+    "Stringency Index Lagged 14 days",
+    "Stringency Index Lagged 14 days squared",
+    "Stringency Index Lagged 14 days * Social Capital Dummy"
+  ),
+  title = "Alternate Social Capital Measures",
+  column.labels = c(
+    "Alesina La Ferrara",
+    "Putnam",
+    "Penn State"
+  ),
+  # style = "aer",
+  dep.var.labels = "Daily New Cases per Million",
+  float.env = "table*"
+)
+```
+
+
+
+# Table 3 {.tabset}
+## models
+```{r table-3-models}
+model_mar_may <- 
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = df %>% filter(date <= "2020-05-31"),
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+model_jun_aug <- 
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = df %>% filter(date >= "2020-06-01" & date <= "2020-08-31"),
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+model_sep_nov <- 
+plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = df %>% filter(date >= "2020-09-01"),
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+```
+
+## table
+
+```{r table-3, message=FALSE, warning=FALSE, results='asis'}
+stargazer(
+  model_mar_may,
+  model_jun_aug,
+  model_sep_nov,
+  header = FALSE,
+  type = "latex",
+  df = FALSE,
+  # align = TRUE,
+  covariate.labels = c(
+    "Stringency Index Lagged 14 days",
+    #   "Social Capital Dummy",
+    "Stringency Index Lagged 14 days squared",
+    #   "Median Household Income",
+    #   "Percent of Adults with Bachelor's Degree",
+    #   "Percent of Adults in Fair or Poor Health",
+    #   "Percent of Population that is Black",
+    #   "Population Density",
+    #   "Percent of Population in Rural Areas",
+    #   "Percent of Population greater than 65 years old",
+    #   "Average Temperature",
+    #   "Republican Governor",
+    "Stringency Index Lagged 14 days * Social Capital Dummy"
+  ),
+  title = "Regression Results by Season",
+  column.labels = c(
+    "Mar - May",
+    "Jun- Aug",
+    "Sep - Nov"
+  ),
+  # style = "aer",
+  dep.var.labels = "Daily New Cases per Million"#,
+)
+```
+
+# Table 4
+
+## models
+
+```{r table-4-models}
+model_one_sd <- 
+  df %>%
+  mutate(state_level_dummy = ifelse(state_level_index >= 1, 1, 0)) %>% 
+  plm(
+    cases_new ~ stringency_index_lag * state_level_dummy +
+      I(stringency_index_lag ^ 2),
+    data = .,
+    effect = "twoways",
+    index = "state",
+    model = "within"
+  )
+```
+
+## table 4
+
+```{r table-4, message=FALSE, results='asis'}
+stargazer(
+  model_one_sd,
+  header = FALSE,
+  type = "latex",
+  df = FALSE,
+  covariate.labels = c(
+    "Stringency Index Lagged 14 days",
+    "Stringency Index Lagged 14 days squared",
+    "Stringency Index Lagged 14 days * Social Capital Dummy"
+  ),
+  title = "Positive Social Capital >= 1 Standard Deviation",
+  dep.var.labels = "Daily New Cases per Million"
+)
+```
+

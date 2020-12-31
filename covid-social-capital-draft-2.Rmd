@@ -1,5 +1,5 @@
 ---
-title: "Covid Draft 1"
+title: "Covid Draft 2"
 author: "Tony Carilli"
 date: "12/11/2020"
 output: html_document
@@ -8,7 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, options(scipen = 999), digits = 3)
 library(tidyverse)
-library(lmtest)
+# library(lmtest)
+library(gt)
 ```
 
 # Data
@@ -24,7 +25,7 @@ df <-
 
 # Base Model
 
-$$\mathit{New Cases} = \beta_0 + \beta_1\mathit{Stringency}+\beta_2\mathit{Social Capital}+\beta_3\mathit{Sringency*SocialCapital + \sum\gamma_i\mathit{X_i}} + \epsilon $$
+$$\mathit{New Cases} = \beta_0 + \beta_1\mathit{Stringency} + \beta_2\mathit{Sringency*SocialCapital + \sum\gamma_i\mathit{X_i}} + \epsilon $$
 # base model 
 
 ## effect = time
@@ -132,8 +133,10 @@ df %>%
 
 ```{r}
 df %>% 
+  filter(date >= "2020-09-01" & date <= "2020-11-30") %>% 
   plm::plm(
-    cases_new ~ stringency_index_lag * state_level_dummy, # +
+    cases_new ~ stringency_index_lag * state_level_dummy + 
+      I(stringency_index_lag^2), # +
       # median_household_income + 
       # percent_adults_with_ba + 
       # percent_in_fair_or_poor_health +
@@ -197,6 +200,7 @@ model_names <- c(
   "collective_efficacy",
   "philanthropic_health",
   "trust_neighbor",
+  "penn_state",
   "putnam_index",
   "ferrara",
   "family_prosperity"
@@ -213,6 +217,7 @@ social_capital <- c(
   "philanthropic_health_dummy",
   "neighbor_dummy",
   "putnam_index",
+  "scp_version_of_penn_state_index",
   "alesina_la_ferrara_social_capital_group",
   "family_prosperity_index"
 )
@@ -260,29 +265,33 @@ estimated_models <-
 
 models_tidy <- 
   estimated_models %>% 
-  transmute(model_name, betas = purrr::map(fit, broom::tidy))
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
 
+models_glanced <- 
+  estimated_models %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
 
-estimated_models$fit %>% 
-  purrr::map_df(broom::tidy) %>% 
-  mutate(model = rep(names(models), each = 12), .before = "term") %>% 
-  pivot_longer(cols = 3:6,
-               names_to = "estimate",
-               values_to = "value")
-  
-
-estimated_models$fit %>% 
-  purrr::map_df(broom::tidy) %>% 
-  mutate(model = rep(names(models), each = 12), .before = "term") %>% 
-  pivot_wider(names_from = model)
+# estimated_models$fit %>% 
+#   purrr::map_df(broom::tidy) %>% 
+#   mutate(model = rep(names(models), each = 12), .before = "term") %>% 
+#   pivot_longer(cols = 3:6,
+#                names_to = "estimate",
+#                values_to = "value")
+#   
+# 
+# estimated_models$fit %>% 
+#   purrr::map_df(broom::tidy) %>% 
+#   mutate(model = rep(names(models), each = 12), .before = "term") %>% 
+#   pivot_wider(names_from = model)
 
 models_tidy %>% 
   unnest_wider(betas) %>% 
   # unnest_longer(term) %>% 
   unnest_wider(estimate, names_sep = "_") %>% 
   unnest_wider(std.error, names_sep = "_") %>% 
-  select(model_name, ends_with(c("_1", "_2", "_12")))
+  select(model_names, ends_with(c("_1", "_2", "_12")))
 ```
+
 
 ### effect = twoways
 
@@ -307,28 +316,123 @@ estimated_models <-
 
 models_tidy <- 
   estimated_models %>% 
-  transmute(model_name, betas = purrr::map(fit, broom::tidy))
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced <- 
+  estimated_models %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
 
 
-estimated_models$fit %>% 
-  purrr::map_df(broom::tidy) %>% 
-  mutate(model = rep(names(models), each = 2), .before = "term") %>% 
-  pivot_longer(cols = 3:6,
-               names_to = "estimate",
-               values_to = "value")
-  
-
-estimated_models$fit %>% 
-  purrr::map_df(broom::tidy) %>% 
-  mutate(model = rep(names(models), each = 2), .before = "term") %>% 
-  pivot_wider(names_from = model)
+# estimated_models$fit %>% 
+#   purrr::map_df(broom::tidy) %>% 
+#   mutate(model = rep(names(models), each = 2), .before = "term") %>% 
+#   pivot_longer(cols = 3:6,
+#                names_to = "estimate",
+#                values_to = "value")
+#   
+# 
+# estimated_models$fit %>% 
+#   purrr::map_df(broom::tidy) %>% 
+#   mutate(model = rep(names(models), each = 2), .before = "term") %>% 
+#   pivot_wider(names_from = model)
 
 models_tidy %>% 
   unnest_wider(betas) %>% 
   # unnest_longer(term) %>% 
   unnest_wider(estimate, names_sep = "_") %>% 
   unnest_wider(std.error, names_sep = "_") %>% 
-  select(model_name, ends_with(c("_1", "_2")))
+  select(model_names, ends_with(c("_1", "_2")))
+```
+
+#### broken by date 2-way
+
+##### mar-may
+
+```{r mar-may}
+
+for (i in seq_along(social_capital)) {
+  models[[i]] <-
+    glue::glue(
+      'cases_new ~ stringency_index_lag * 
+      social_capital[i] + I(stringency_index_lag^2)'
+    )
+}
+
+model_frame <- tibble(model = models) %>% 
+  mutate(model_name = names(model))
+
+model_frame <- model_frame %>% 
+  mutate(model = map(model, as.formula))
+
+
+estimated_models <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% 
+                                      filter(date >= "2020-03-01" & date <= "2020-05-31"),
+                                    effect = "twoways", index = "state", model = "within")))
+
+models_tidy <- 
+  estimated_models %>% 
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced <- 
+  estimated_models %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
+
+models_tidy %>% 
+  unnest_wider(betas) %>% 
+  unnest_wider(estimate, names_sep = "_") %>% 
+  unnest_wider(std.error, names_sep = "_") #%>% 
+  # select(model_names, ends_with(c("_1", "_2")))
+
+```
+
+##### jun - aug
+
+```{r jun-aug}
+estimated_models <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% 
+                                      filter(date >= "2020-06-01" & date <= "2020-08-31"),
+                                    effect = "twoways", index = "state", model = "within")))
+
+models_tidy <- 
+  estimated_models %>% 
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced <- 
+  estimated_models %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
+
+models_tidy %>% 
+  unnest_wider(betas) %>% 
+  unnest_wider(estimate, names_sep = "_") %>% 
+  unnest_wider(std.error, names_sep = "_") %>% 
+  select(model_names, ends_with(c("_1", "_2")))
+```
+
+##### sep - nov
+
+```{r sep-nov}
+estimated_models <- 
+  model_frame %>% 
+  mutate(fit = map(model, ~plm::plm(., data = df %>% 
+                                      filter(date >= "2020-09-01" & date <= "2020-11-30"),
+                                    effect = "twoways", index = "state", model = "within")))
+
+models_tidy <- 
+  estimated_models %>% 
+  transmute(model_names, betas = purrr::map(fit, broom::tidy))
+
+models_glanced <- 
+  estimated_models %>% 
+  transmute(model_names, stats = purrr::map(fit, broom::glance))
+
+models_tidy %>% 
+  unnest_wider(betas) %>% 
+  unnest_wider(estimate, names_sep = "_") %>% 
+  unnest_wider(std.error, names_sep = "_") %>% 
+  select(model_names, ends_with(c("_1", "_2")))
 ```
 
 
@@ -423,8 +527,136 @@ models_tidy %>%
 
 
 
-# broken by date
 
+# tables
+## table 1 JEC
+
+```{r table-1}
+models_tidy %>% 
+  left_join(models_glanced, by = "model_names") %>% 
+  unnest(c(betas, stats), names_repair = "universal") %>% 
+  select(model_names, estimate, std.error, r.squared, statistic...9, p.value...10, nobs) %>% 
+  rename(f_stat = statistic...9, p_val = p.value...10) %>% 
+  mutate(term = rep(c("si", "interact"), times = 13), .before = estimate) %>% 
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(nobs = as.integer(nobs)) %>% 
+  pivot_longer(-c(model_names, term),
+               names_to = "measure",
+               values_to = "value") %>% 
+  pivot_wider(names_from = model_names) %>% 
+  slice(1, 2, 7:12) %>% 
+  mutate(measure = c(
+    "Stringency Index",
+    "se",
+    "Stringency Index * Social Capital Index",
+    "se",
+    "R-sqr",
+    "F",
+    "p-value",
+    "N"
+  )
+  ) %>% 
+  # arrange(match(measure, c("estimate", "std.error")), term) %>% 
+  gt() %>% 
+  fmt_number(model_names, rows = 8, decimals = 0) %>% 
+  cols_label(measure = "",
+             state = "Total Social Capital",
+             family_unity = "Family Unity",
+             family_interaction = "Family Interaction",
+             social_support = "Social Support",
+             community_health = "Community Health",
+             institutional_health = "Instutional Health",
+             collective_efficacy = "Collective Efficacy",
+             philanthropic_health = "Philanthropic Health",
+             trust_neighbor = "Trust Neighbors"
+  ) %>% 
+  tab_spanner("Sub-Index", model_names[2:9]) %>% 
+  cols_align("center") %>% 
+  cols_hide(c(1, 12:15)) %>% 
+  opt_table_lines("default") %>% 
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = vars(measure),
+      rows = 7:8
+    )
+  ) %>% 
+  tab_footnote(
+    footnote = "Siginicant at the 1% level",
+    locations = cells_body(
+      columns = vars(model_names),
+      rows = c(1,3)
+    )
+  ) %>% 
+  opt_footnote_marks(marks = c("*", "+")) %>% 
+  tab_header(
+    title = "Two-way Fixed Effects Results",
+    subtitle = "Joint Economic Committee Social Capital Indicies")
+```
+
+## table 1 other indexes
+
+```{r}
+models_tidy %>% 
+  left_join(models_glanced, by = "model_names") %>% 
+  unnest(c(betas, stats), names_repair = "universal") %>% 
+  select(model_names, estimate, std.error, r.squared, statistic...9, p.value...10, nobs) %>% 
+  rename(f_stat = statistic...9, p_val = p.value...10) %>% 
+  mutate(term = rep(c("si", "interact"), times = 13), .before = estimate) %>% 
+  mutate(across(where(is.numeric), round, 3)) %>%
+  mutate(nobs = as.integer(nobs)) %>% 
+  pivot_longer(-c(model_names, term),
+               names_to = "measure",
+               values_to = "value") %>% 
+  pivot_wider(names_from = model_names) %>% 
+  slice(1, 2, 7:12) %>% 
+  mutate(measure = c(
+    "Stringency Index",
+    "se",
+    "Stringency Index * Social Capital Index",
+    "se",
+    "R-sqr",
+    "F",
+    "p-value",
+    "N"
+  )
+  ) %>% 
+  # arrange(match(measure, c("estimate", "std.error")), term) %>% 
+  gt() %>% 
+  fmt_number(model_names, rows = 8, decimals = 0) %>% 
+  cols_label(measure = "",
+             penn_state = "Penn State Index (SCP)",
+             putnam_index = "Putnam Index",
+             ferrara = "Alesina La Ferrar",
+             family_prosperity = "Family Prosperity"
+  ) %>% 
+  # tab_spanner("Sub-Index", model_names[2:9]) %>% 
+  cols_align("center") %>% 
+  cols_hide(c(1, 3:11)) %>% 
+  opt_table_lines("default") %>% 
+  tab_style(
+    style = cell_text(style = "italic"),
+    locations = cells_body(
+      columns = vars(measure),
+      rows = 7:8
+    )
+  ) %>% 
+  tab_footnote(
+    footnote = "Siginicant at the 1% level",
+    locations = cells_body(
+      columns = vars(model_names),
+      rows = c(1,3)
+    )
+  ) %>% 
+  opt_footnote_marks(marks = c("*", "+")) %>% 
+  tab_header(
+    title = "Two-way Fixed Effects Results",
+    subtitle = "Social Capital Indices")
+```
+
+
+
+## 
 
 
 # residuals

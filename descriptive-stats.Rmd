@@ -75,15 +75,24 @@ df %>%
 df %>% 
   group_by(state) %>% 
   filter(!is.na(cases_new)) %>% 
-  ggplot(aes(y = cases_new, x = fct_reorder(as.factor(state), cases_new, median))) + 
-  geom_boxplot()
+  ggplot(aes(y = cases_new, x = fct_reorder(as.factor(state), cases_new, median), 
+             color = factor(state_level_dummy))) + 
+  geom_boxplot() 
 ```
 
 ```{r}
 df %>% 
   group_by(state) %>% 
+  filter(state != "VI") %>% 
   # filter(cases_new > 0) %>% 
-  ggplot(aes(y = stringency_index, x = fct_reorder(as.factor(state), stringency_index, median))) + 
+  ggplot(aes(y = stringency_index, x = fct_reorder(state, stringency_index, median, na.rm = TRUE),
+         fill = factor(state_level_dummy))) + 
   geom_boxplot()
+```
+
+```{r}
+OxCGRT %>% 
+  filter(state == "IN") %>% 
+  select(date, stringency_index)
 ```
 
