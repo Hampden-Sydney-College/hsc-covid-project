@@ -18,7 +18,7 @@ library(bibtex)
 
 Titles
 
-Fighting Covid-19 Together: the Complementarity between Social Capital and Stringency in the United States
+Stifling Covid-19 Together: the Complementarity between Social Capital and Stringency in the United States
 
 Do As Your Told; Follow the Leader
 
