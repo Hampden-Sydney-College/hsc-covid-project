@@ -1,0 +1,22 @@
+---
+title: "citation"
+author: "Carilli"
+date: "12/30/2020"
+output: html_document
+bibliography: covid-references.bib
+nocite: |
+  @wong_social_2020
+  @noauthor_social_nodate
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(bibtex)
+```
+
+let's cite the article Oxford University’s COVID-19 Government Response Tracker (OxCGRT) [@hale_oxford_2020]
+
+abc def
+
+# References
