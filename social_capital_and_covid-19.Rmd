@@ -6,7 +6,6 @@ output:
   html_document:
     toc: true
     toc_float: true
-    indent: true
     number_sections: true
 ---
 
@@ -19,10 +18,16 @@ Titles
 
 Fighting Covid-19 Together: the Complementarity between Social Capital and Stringency in the United States
 
-Do As Your Told
-Follow the Leader
+Do As Your Told; Follow the Leader
 
-Subtitle The Complementarity between Social Capital and Formal Public Health Rules in the United States
+Stifling Covid-19, Aiding (or Aiding) the People
+Stifling Covid-19, Release the People
+
+Curb Covid-19, Promote the People
+
+Strengthen Social Capital, Curb Covid-19
+
+Subtitle: The Complementarity between Social Capital and Formal Public Health Rules in the United States
 
 Abstract
 
@@ -154,38 +159,24 @@ In Table 3 we re-estimate our equations 2 and 3 with alternate measures of socia
 
 Insert table 2 and 3 here
 
-Borgonovi and Andrieu (2020) suggest that people living in counties (in the United States) with more social capital reduced their mobility. Borgonovi, Andrieu, and Subramanian (2020) also found that early on infection rates were higher in counties with more social capital, but transmission and mortality rates declined as people learned more about Covid-19. In order to analyze whether the impact of stringency and social capital has changed over the course of the pandemic, we break our sample into two specific time periods: March 1 – July 4 and July 5 – November 21.
+Borgonovi and Andrieu (2020) suggest that people living in counties (in the United States) with more social capital reduced their mobility. Borgonovi, Andrieu, and Subramanian (2020) also found that early on infection rates were higher in counties with more social capital, but transmission and mortality rates declined as people learned more about Covid-19. In order to analyze whether the impact of stringency and social capital has changed over the course of the pandemic, we break our sample into two specific time periods: March 1 -- July 4 and July 5 -- November 21.
 
 Insert Table 4 here
 
-Table 4 reports the results of our variables of interest for equation 3.[^11] In the first half of the COVID-19 outbreak we see that increased levels of stringency had no significant effect on prevalence, though a higher level of social capital led to a statistically significant increase in prevalence. This result supports earlier findings within the literature. Our results also reiterate that states with high social capital saw a significantly lower number of cases as stringency increased. In the second half of the Covid-19 outbreak, post-July 4, we see that higher levels of stringency significantly reduce the number of daily cases, but the impact of higher stringency diminishes more rapidly. This suggests that the higher levels of initial stringency are impactful, but higher levels of stringency over a certain level are less so. Having an above average level of social capital leads to an increase of almost 415 cases per million, supporting the idea that higher social capital states, ceteris paribus, might find it difficult to maintain social distancing over time and are more susceptible to "COVID fatigue." That said there is still a significant reduction in cases in states that have above average social capital and increased preventative measures.
+Table 4 reports the results of our variables of interest for equation 3.[^11] In the first half of the COVID-19 outbreak we see that increased levels of stringency had no significant effect on prevalence, though a higher level of social capital led to a statistically significant increase in prevalence. This result supports earlier findings within the literature. Our results also reiterate that states with high social capital saw a significantly lower number of cases as stringency increased. In the second half of the Covid-19 outbreak, post-July 4, we see that higher levels of stringency significantly reduce the number of daily cases, but the impact of higher stringency diminishes more rapidly. This suggests that the higher levels of initial stringency are impactful, but higher levels of stringency over a certain level are less so. Having an above average level of social capital leads to an increase of almost 415 cases per million, supporting the idea that higher social capital states, *ceteris paribus*, might find it difficult to maintain social distancing over time and are more susceptible to "COVID fatigue." That said there is still a significant reduction in cases in states that have above average social capital and increased preventative measures.
 
 [^11]: We did run this regression with the same controls as above, but we do not report these results; they are available upon request.
 
 # Conclusion
 
-Notes:
+Our framework advances the literature on social capital and infectious diseases by specifying some of the conditions under which social capital influences the spread of Covid-19. We show that people stifle the spread of Covid-19 when they value prevention and when they have stronger social capital. Such results might seem commonplace, but they are unrecognized in the existing literature and they have important, unrecognized implications.
 
--   Social capital consistently influences infectious and preventative behaviors.
+We suggest that current Covid-19 policies focusing primarily on formal stringency measures are misguided when the values of people and their level of social capital are ignored. For example, recognizing these factors might suggest some states are too stringent given their values and their social capital. We also suggest caution when analyzing public health policies and social capital and whether they influence the spread of infectious diseases. When the effectiveness of formal public health policies are estimated without regard to social capital, and when the effectiveness of social capital is estimated without regard to formal public health measures, such estimates tend to be overestimated. Furthermore, subsequent analyses should include interactions effects between these formal and informal mechanisms. 
 
--   Informal rules like those found in social capital influence behavior and bolster formal rules.
+While we do show that the interaction between social capital and stringent policies lowers the spread of Covid-19, this does not mean any one person or group has the ability to alter social capital or maintain the effectiveness of stringent policies. Social capital emerges when individuals value participating in a social interaction; it is not clear how governmental officials, let alone public health officials, can know of or can influence such values and interactions. Even if officials could alter social capital, our results suggest such policies would be effective only when people already value prevention. Finally, our results show that increasing the level of stringent policies is only so effective beyond a certain level, given the role social capital plays in encouraging adherence to public health policies.
 
--   Policy implications are difficult to tease out given social capital emerges from the interactions between indivdiuals. Social capital is a deeper notion than merely doing what an elected official tells us to do. Trusted advisers, business contacts, friends, and family comprise our social networks and capital.
+Alternatively, public health policy can focus on the provision of quality information about Covid-19 transmission, as well as encouraging individuals to seek out relevant tests. Such measures encourage individuals to make decisions and *invest* in existing social ties according to their values.
 
-While we can easily identify measures of social capital, e.g., the number of community centers or the percent of people who donate to charitable organizations, cultivating social capital---in the way it is meant in the literature---is not so simple. Perhaps for future outbreaks, we can discuss the role social capital might have and how to bolster that capital, but it seems unlikely that it will come from a centralized source.
-
--   Future research should study the extent to which social capital erodes over time particularly because of formal rules that prevent interactions. That is, while we find social capital bolsters formal rules, those formal rules might extinguish the necessary parts of social capital given a longer duration or additional severity. This is especially once we recognize the cultural context within which social capital emerges, i.e., human interactions and the norms of proper behavior that develop. Formal rules that make such interactions more costly are likely to alter the costs and benefits people face such that existing social capital erodes (Carilli, Coyne, and Leeson, 2008) and alternative kinds of social capital will arise. Indeed, if formal rules prevent interactions that would have otherwise taken place, individuals realize less of a benefit from maintaining existing social ties.
-
-Alternatively, emphasis should be placed on providing quality information about Covid-19 transmission, as well as encouraging individuals to seek out relevant tests. Such measures encourage individuals to make decisions and *invest* in existing social ties according to their values.
-
--   If two states have a stringency index of "6" - do they have the same policies? What are the potential differences? Same with social capital...
-
--   Supporting Evidence:
-
-    * Within states that have the worst social capital, are there pockets that have high social capital?
-
-    * Similarly, among the states that have really high social capital, are there pockets of really low social capital?
-
-At the aggregate level, state scores might have social capital scores that obviously do not accurately reflect differences in social capital at the county level.
+Future research should study the extent to which social capital erodes over time particularly because of formal rules that prevent interactions. That is, while we find social capital bolsters stringent policies, those formal rules might begin to extinguish the necessary parts of social capital given a longer duration or additional severity. This is especially once we recognize the cultural context within which social capital emerges, i.e., human interactions and the norms of proper behavior that develop. Formal rules that make such interactions more costly are likely to alter the costs and benefits people face such that existing social capital erodes (Carilli, Coyne, and Leeson, 2008) and alternative kinds of social capital will arise. Indeed, if formal rules prevent interactions that would have otherwise taken place, individuals realize less of a benefit from maintaining existing social ties.
 
 References
