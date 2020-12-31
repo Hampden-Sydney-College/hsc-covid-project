@@ -188,4 +188,4 @@ Alternatively, emphasis should be placed on providing quality information about 
 
 At the aggregate level, state scores might have social capital scores that obviously do not accurately reflect differences in social capital at the county level.
 
-# References
+References
