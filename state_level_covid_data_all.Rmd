@@ -1,0 +1,92 @@
+---
+title: "Covid Data Dec 1"
+author: "Tony Carilli"
+date: "12/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Oxford COVID-19 Government Response Tracker
+
+Retrieve the data from github and clean names
+
+```{r}
+library(RCurl) 
+df <- 
+  getURL("https://raw.githubusercontent.com/OxCGRT/USA-covid-policy/master/data/OxCGRT_US_latest.csv") %>% 
+  read_csv() %>% 
+  janitor::clean_names() 
+```
+
+Filter for state-level data and select indices, dates, deaths, cases, create new cases and deaths
+
+```{r}
+df_state <- 
+df %>% 
+  filter(jurisdiction == "STATE_WIDE") %>% 
+  select(state = region_code, date, starts_with("confirmed"),
+         stringency_index, government_response_index, containment_health_index, 
+         economic_support_index) %>% 
+  mutate(date = lubridate::ymd(date)) 
+      
+```
+
+mobility data
+
+```{r}
+mobility <- 
+  here::here("data/us_mobility_report.csv") %>% 
+  read_csv() %>% 
+  mutate(iso_3166_2_code = str_replace(iso_3166_2_code, "-", "_")) %>% 
+  select(-c(country_region_code, state, county, fips))
+```
+
+```{r}
+demographics <- 
+  here::here("data", "demographics.csv") %>% 
+  read_csv() %>% 
+  select(-c(rural_population, urban_population, largest_city_population,
+            clustered_population, population_density, human_development_index))
+```
+
+social capital data
+
+```{r}
+social_capital <- 
+here::here("data", "HHI Data.xlsx") %>% 
+  readxl::read_xlsx(sheet = "Full Data") %>% 
+  janitor::clean_names() %>% 
+  mutate(iso_3166_2_code = str_c("US_", state_abbreviation)) %>% 
+  select(-c(fips_code, alt_fips_code, state, state_abbreviation)) %>% 
+  rename(population_density = popden)
+```
+
+
+create per capita cases and deaths 
+join all files
+
+
+```{r}
+df_state %>% 
+  left_join(demographics, by = c("state" = "key")) %>% 
+  group_by(state) %>% 
+  mutate(deaths_new = ((confirmed_deaths - dplyr::lag(confirmed_deaths)) / population) * 1000000,
+         cases_new = ((confirmed_cases - dplyr::lag(confirmed_cases)) / population) * 1000000
+         ) %>% 
+  relocate(deaths_new, cases_new, .after = confirmed_deaths)  %>% 
+  ungroup() %>% 
+  left_join(mobility, by = c("state" = "iso_3166_2_code", "date")) %>% 
+  left_join(social_capital, by = c("state" = "iso_3166_2_code")) %>% 
+  write_csv("data/covid_state_level.csv")
+```
+
+
+```{r}
+social_capital %>% 
+  left_join(demographics, by = c("iso_3166_2_code" = "key"))
+```
+
